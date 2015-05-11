@@ -29,6 +29,8 @@ func (m *CommandCloudStatus) Start(respChan chan string, promptChan chan string,
 func (m *CommandCloudStatus) getCloudStatus(cargo interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewCloudStatus()
 	args := o.NewGet()
+	// TODO: this must be entered by repl user.
+	args.Location = "zrh"
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {
