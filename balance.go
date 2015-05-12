@@ -3,23 +3,20 @@ package main
 import (
 	"fmt"
 	"github.com/russmack/cloudsigma"
+	"github.com/russmack/replizer"
 	"github.com/russmack/statemachiner"
 )
 
 type CommandBalance struct {
-	responseChan chan string
-	promptChan   chan string
-	userChan     chan string
+	channels *replizer.Channels
 }
 
 func NewBalance() *CommandBalance {
 	return &CommandBalance{}
 }
 
-func (m *CommandBalance) Start(respChan chan string, promptChan chan string, userChan chan string) {
-	m.responseChan = respChan
-	m.promptChan = promptChan
-	m.userChan = userChan
+func (m *CommandBalance) Start(channels *replizer.Channels) {
+	m.channels = channels
 	stateMachine := &statemachiner.StateMachine{}
 	stateMachine.StartState = m.getBalance
 	cargo := CommandBalance{}
@@ -29,14 +26,16 @@ func (m *CommandBalance) Start(respChan chan string, promptChan chan string, use
 func (m *CommandBalance) getBalance(cargo interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewBalance()
 	args := o.NewGet()
-	fmt.Println("Username:", config.Login().Username)
-	args.Username = config.Login().Username
-	args.Password = config.Login().Password
+	// TODO: do this better.
+	fmt.Println("Username:", session.Username)
+	args.Username = session.Username
+	args.Password = session.Password
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {
+		// TODO: get rid of fmt.Println
 		fmt.Println("Error calling client.", err)
 	}
-	m.responseChan <- string(resp)
+	m.channels.ResponseChan <- string(resp)
 	return nil
 }

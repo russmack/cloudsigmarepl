@@ -3,23 +3,20 @@ package main
 import (
 	"fmt"
 	"github.com/russmack/cloudsigma"
+	"github.com/russmack/replizer"
 	"github.com/russmack/statemachiner"
 )
 
 type CommandLocations struct {
-	responseChan chan string
-	promptChan   chan string
-	userChan     chan string
+	channels *replizer.Channels
 }
 
 func NewLocations() *CommandLocations {
 	return &CommandLocations{}
 }
 
-func (m *CommandLocations) Start(respChan chan string, promptChan chan string, userChan chan string) {
-	m.responseChan = respChan
-	m.promptChan = promptChan
-	m.userChan = userChan
+func (m *CommandLocations) Start(channels *replizer.Channels) {
+	m.channels = channels
 	stateMachine := &statemachiner.StateMachine{}
 	stateMachine.StartState = m.getLocations
 	cargo := CommandLocations{}
@@ -32,8 +29,9 @@ func (m *CommandLocations) getLocations(cargo interface{}) statemachiner.StateFn
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {
+		// TODO: should be no fmt.Println
 		fmt.Println("Error calling client.", err)
 	}
-	m.responseChan <- string(resp)
+	m.channels.ResponseChan <- string(resp)
 	return nil
 }

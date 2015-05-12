@@ -3,36 +3,26 @@ package main
 import (
 	"fmt"
 	"github.com/russmack/cloudsigma"
+	"github.com/russmack/replizer"
 	"github.com/russmack/statemachiner"
 	"os"
 	"strings"
 )
 
 type CommandGetNotifyPrefs struct {
-	responseChan chan string
-	promptChan   chan string
-	userChan     chan string
+	channels *replizer.Channels
 }
 
 type CommandSetNotifyPrefs struct {
-	//Contact      string `json:"contact"`
-	//Medium       string `json:"medium"`
-	//Type         string `json:"type"`
-	//Value        bool   `json:"value"`
-	//Pref cloudsigma.Preference
-	responseChan chan string
-	promptChan   chan string
-	userChan     chan string
+	channels *replizer.Channels
 }
 
 func NewGetNotifyPrefs() *CommandGetNotifyPrefs {
 	return &CommandGetNotifyPrefs{}
 }
 
-func (g *CommandGetNotifyPrefs) Start(respChan chan string, promptChan chan string, userChan chan string) {
-	g.responseChan = respChan
-	g.promptChan = promptChan
-	g.userChan = userChan
+func (g *CommandGetNotifyPrefs) Start(channels *replizer.Channels) {
+	g.channels = channels
 	stateMachine := &statemachiner.StateMachine{}
 	stateMachine.StartState = g.getNotifyPrefs
 	//cargo := CommandGetNotifyPrefs{}
@@ -43,22 +33,20 @@ func (g *CommandGetNotifyPrefs) Start(respChan chan string, promptChan chan stri
 func (g *CommandGetNotifyPrefs) getNotifyPrefs(cargo interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewNotificationPreferences()
 	args := o.NewGet()
-	fmt.Println("Username:", config.Login().Username)
-	args.Username = config.Login().Username
-	args.Password = config.Login().Password
+	fmt.Println("Username:", session.Username)
+	args.Username = session.Username
+	args.Password = session.Password
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {
 		fmt.Println("Error calling client.", err)
 	}
-	g.responseChan <- string(resp)
+	g.channels.ResponseChan <- string(resp)
 	return nil
 }
 
-func (m *CommandSetNotifyPrefs) Start(respChan chan string, promptChan chan string, userChan chan string) {
-	m.responseChan = respChan
-	m.promptChan = promptChan
-	m.userChan = userChan
+func (m *CommandSetNotifyPrefs) Start(channels *replizer.Channels) {
+	m.channels = channels
 	stateMachine := &statemachiner.StateMachine{}
 	stateMachine.StartState = m.setNotifyPrefsContact
 	cargo := CommandSetNotifyPrefs{}
@@ -68,8 +56,8 @@ func (m *CommandSetNotifyPrefs) Start(respChan chan string, promptChan chan stri
 func (m *CommandSetNotifyPrefs) setNotifyPrefsContact(cargo interface{}) statemachiner.StateFn {
 	// The state machine will not progress beyond this point until the repl
 	// pops from the promptChan.
-	m.promptChan <- "Contact:"
-	s := <-m.userChan
+	m.channels.PromptChan <- "Contact:"
+	s := <-m.channels.UserChan
 	//c, ok := cargo.(CommandSetNotifyPrefs)
 	c, ok := cargo.(cloudsigma.Preference)
 	if ok {
@@ -81,8 +69,8 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsContact(cargo interface{}) statema
 }
 
 func (m *CommandSetNotifyPrefs) setNotifyPrefsMedium(cargo interface{}) statemachiner.StateFn {
-	m.promptChan <- "Medium:"
-	s := <-m.userChan
+	m.channels.PromptChan <- "Medium:"
+	s := <-m.channels.UserChan
 	c, ok := cargo.(cloudsigma.Preference)
 	if ok {
 		c.Medium = s
@@ -93,20 +81,21 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsMedium(cargo interface{}) statemac
 }
 
 func (m *CommandSetNotifyPrefs) setNotifyPrefsType(cargo interface{}) statemachiner.StateFn {
-	m.promptChan <- "Type:"
-	s := <-m.userChan
+	m.channels.PromptChan <- "Type:"
+	s := <-m.channels.UserChan
 	c, ok := cargo.(cloudsigma.Preference)
 	if ok {
 		c.Type = s
 	} else {
+		// TODO: clean this.
 		fmt.Println("assertion not ok")
 	}
 	return m.setNotifyPrefsValue(c)
 }
 
 func (m *CommandSetNotifyPrefs) setNotifyPrefsValue(cargo interface{}) statemachiner.StateFn {
-	m.promptChan <- "Value (true|false):"
-	s := <-m.userChan
+	m.channels.PromptChan <- "Value (true|false):"
+	s := <-m.channels.UserChan
 	c, ok := cargo.(cloudsigma.Preference)
 	if ok {
 		val := false
@@ -116,11 +105,13 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsValue(cargo interface{}) statemach
 		case "false":
 			val = false
 		default:
+			// TODO: clean this.
 			fmt.Println("Invalid input.")
 			os.Exit(1)
 		}
 		c.Value = val
 	} else {
+		// TODO: clean this.
 		fmt.Println("assertion not ok")
 		os.Exit(1)
 	}
@@ -130,6 +121,7 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsSendRequest(cargo interface{}) sta
 	o := cloudsigma.NewNotificationPreferences()
 	c, ok := cargo.(cloudsigma.Preference)
 	if !ok {
+		// TODO: clean this.
 		fmt.Println("assertion not ok")
 		os.Exit(1)
 	}
@@ -139,8 +131,9 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsSendRequest(cargo interface{}) sta
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {
+		// TODO: clean this.
 		fmt.Println("Error calling client.", err)
 	}
-	m.responseChan <- string(resp)
+	m.channels.ResponseChan <- string(resp)
 	return nil
 }
