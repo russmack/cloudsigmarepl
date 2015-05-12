@@ -11,7 +11,8 @@ A REPL for the CloudSigma IaaS REST API.
 ## Usage
 ```
 Set your login in the config.json.
-go run repl.go
+go build
+./cloudsigmarepl
 ```
 
 ## License
