@@ -30,6 +30,7 @@ func (m *CommandUsage) getUsage(cargo interface{}) statemachiner.StateFn {
 	fmt.Println("Username:", session.Username)
 	args.Username = session.Username
 	args.Password = session.Password
+	args.Location = session.Location
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {
