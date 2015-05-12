@@ -26,6 +26,7 @@ func (m *CommandLocations) Start(channels *replizer.Channels) {
 func (m *CommandLocations) getLocations(cargo interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewLocations()
 	args := o.NewGet()
+	args.Location = session.Location
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {

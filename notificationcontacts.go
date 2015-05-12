@@ -12,9 +12,6 @@ type CommandGetNotifyContacts struct {
 }
 
 type CommandSetNotifyContacts struct {
-	Email    string `json:"email"`
-	Name     string `json:"name"`
-	Phone    string `json:"phone"`
 	channels *replizer.Channels
 }
 
@@ -36,6 +33,7 @@ func (g *CommandGetNotifyContacts) getNotifyContacts(cargs interface{}) statemac
 	fmt.Println("Username:", session.Username)
 	args.Username = session.Username
 	args.Password = session.Password
+	args.Location = session.Location
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {
@@ -49,7 +47,7 @@ func (m *CommandSetNotifyContacts) Start(channels *replizer.Channels) {
 	m.channels = channels
 	stateMachine := &statemachiner.StateMachine{}
 	stateMachine.StartState = m.setNotifyContactsEmail
-	cargo := CommandSetNotifyContacts{}
+	cargo := cloudsigma.Contact{}
 	stateMachine.Start(cargo)
 }
 
@@ -58,7 +56,7 @@ func (m *CommandSetNotifyContacts) setNotifyContactsEmail(cargo interface{}) sta
 	// pops from the promptChan.
 	m.channels.PromptChan <- "Email:"
 	s := <-m.channels.UserChan
-	c, ok := cargo.(CommandSetNotifyContacts)
+	c, ok := cargo.(cloudsigma.Contact)
 	if ok {
 		c.Email = s
 	} else {
@@ -71,7 +69,7 @@ func (m *CommandSetNotifyContacts) setNotifyContactsEmail(cargo interface{}) sta
 func (m *CommandSetNotifyContacts) setNotifyContactsName(cargo interface{}) statemachiner.StateFn {
 	m.channels.PromptChan <- "Name:"
 	s := <-m.channels.UserChan
-	c, ok := cargo.(CommandSetNotifyContacts)
+	c, ok := cargo.(cloudsigma.Contact)
 	if ok {
 		c.Name = s
 	} else {
@@ -84,7 +82,7 @@ func (m *CommandSetNotifyContacts) setNotifyContactsName(cargo interface{}) stat
 func (m *CommandSetNotifyContacts) setNotifyContactsPhone(cargo interface{}) statemachiner.StateFn {
 	m.channels.PromptChan <- "Phone:"
 	s := <-m.channels.UserChan
-	c, ok := cargo.(CommandSetNotifyContacts)
+	c, ok := cargo.(cloudsigma.Contact)
 	if ok {
 		c.Phone = s
 	} else {

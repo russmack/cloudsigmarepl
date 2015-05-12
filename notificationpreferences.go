@@ -21,11 +21,14 @@ func NewGetNotifyPrefs() *CommandGetNotifyPrefs {
 	return &CommandGetNotifyPrefs{}
 }
 
+func NewSetNotifyPrefs() *CommandSetNotifyPrefs {
+	return &CommandSetNotifyPrefs{}
+}
+
 func (g *CommandGetNotifyPrefs) Start(channels *replizer.Channels) {
 	g.channels = channels
 	stateMachine := &statemachiner.StateMachine{}
 	stateMachine.StartState = g.getNotifyPrefs
-	//cargo := CommandGetNotifyPrefs{}
 	cargo := cloudsigma.Preference{}
 	stateMachine.Start(cargo)
 }
@@ -36,6 +39,7 @@ func (g *CommandGetNotifyPrefs) getNotifyPrefs(cargo interface{}) statemachiner.
 	fmt.Println("Username:", session.Username)
 	args.Username = session.Username
 	args.Password = session.Password
+	args.Location = session.Location
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {
@@ -49,7 +53,7 @@ func (m *CommandSetNotifyPrefs) Start(channels *replizer.Channels) {
 	m.channels = channels
 	stateMachine := &statemachiner.StateMachine{}
 	stateMachine.StartState = m.setNotifyPrefsContact
-	cargo := CommandSetNotifyPrefs{}
+	cargo := cloudsigma.Preference{}
 	stateMachine.Start(cargo)
 }
 
@@ -58,7 +62,6 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsContact(cargo interface{}) statema
 	// pops from the promptChan.
 	m.channels.PromptChan <- "Contact:"
 	s := <-m.channels.UserChan
-	//c, ok := cargo.(CommandSetNotifyPrefs)
 	c, ok := cargo.(cloudsigma.Preference)
 	if ok {
 		c.Contact = s
@@ -126,8 +129,9 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsSendRequest(cargo interface{}) sta
 		os.Exit(1)
 	}
 	args := o.NewSet(c)
-	// TODO: this needs to be entered by repl user.
-	args.Location = "zrh"
+	args.Username = session.Username
+	args.Password = session.Password
+	args.Location = session.Location
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {
