@@ -30,8 +30,8 @@ func (m *CommandLocations) getLocations(cargo interface{}) statemachiner.StateFn
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {
-		// TODO: should be no fmt.Println
-		fmt.Println("Error calling client.", err)
+		m.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
+		return nil
 	}
 	m.channels.ResponseChan <- string(resp)
 	return nil

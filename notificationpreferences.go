@@ -5,7 +5,6 @@ import (
 	"github.com/russmack/cloudsigma"
 	"github.com/russmack/replizer"
 	"github.com/russmack/statemachiner"
-	"os"
 	"strings"
 )
 
@@ -36,14 +35,15 @@ func (g *CommandGetNotifyPrefs) Start(channels *replizer.Channels) {
 func (g *CommandGetNotifyPrefs) getNotifyPrefs(cargo interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewNotificationPreferences()
 	args := o.NewGet()
-	fmt.Println("Username:", session.Username)
+	g.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {
-		fmt.Println("Error calling client.", err)
+		g.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
+		return nil
 	}
 	g.channels.ResponseChan <- string(resp)
 	return nil
@@ -66,7 +66,8 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsContact(cargo interface{}) statema
 	if ok {
 		c.Contact = s
 	} else {
-		fmt.Println("assertion not ok")
+		m.channels.ResponseChan <- "Error asserting Preference."
+		return nil
 	}
 	return m.setNotifyPrefsMedium(c)
 }
@@ -78,7 +79,8 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsMedium(cargo interface{}) statemac
 	if ok {
 		c.Medium = s
 	} else {
-		fmt.Println("asserton not ok")
+		m.channels.ResponseChan <- "Error asserting Preference."
+		return nil
 	}
 	return m.setNotifyPrefsType(c)
 }
@@ -90,8 +92,9 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsType(cargo interface{}) statemachi
 	if ok {
 		c.Type = s
 	} else {
-		// TODO: clean this.
-		fmt.Println("assertion not ok")
+		m.channels.ResponseChan <- "Error asserting Preference."
+		// TODO: failed assertion should probably return the startFn.
+		return nil
 	}
 	return m.setNotifyPrefsValue(c)
 }
@@ -108,15 +111,13 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsValue(cargo interface{}) statemach
 		case "false":
 			val = false
 		default:
-			// TODO: clean this.
-			fmt.Println("Invalid input.")
-			os.Exit(1)
+			m.channels.ResponseChan <- "Invalid input."
+			return m.setNotifyPrefsValue(c)
 		}
 		c.Value = val
 	} else {
-		// TODO: clean this.
-		fmt.Println("assertion not ok")
-		os.Exit(1)
+		m.channels.ResponseChan <- "Error asserting Preference."
+		return nil
 	}
 	return m.setNotifyPrefsSendRequest(c)
 }
@@ -124,9 +125,8 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsSendRequest(cargo interface{}) sta
 	o := cloudsigma.NewNotificationPreferences()
 	c, ok := cargo.(cloudsigma.Preference)
 	if !ok {
-		// TODO: clean this.
-		fmt.Println("assertion not ok")
-		os.Exit(1)
+		m.channels.ResponseChan <- "Error asserting Preference."
+		return nil
 	}
 	args := o.NewSet(c)
 	args.Username = session.Username
@@ -135,8 +135,8 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsSendRequest(cargo interface{}) sta
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {
-		// TODO: clean this.
-		fmt.Println("Error calling client.", err)
+		m.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
+		return nil
 	}
 	m.channels.ResponseChan <- string(resp)
 	return nil

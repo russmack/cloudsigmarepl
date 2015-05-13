@@ -45,7 +45,7 @@ func (m *CommandSetConfigLocation) Start(channels *replizer.Channels) {
 func (m *CommandSetConfigLocation) setConfigLocation(cargo interface{}) statemachiner.StateFn {
 	// The state machine will not progress beyond this point until the repl
 	// pops from the promptChan.
-	m.channels.PromptChan <- "Location:"
+	m.channels.PromptChan <- "Enter service location:"
 	s := <-m.channels.UserChan
 	if s != "zrh" && s != "hnl" && s != "wdc" && s != "sjs" {
 		m.channels.MessageChan <- "Unknown location.  Options: zrh | hnl | wdc | sjc"

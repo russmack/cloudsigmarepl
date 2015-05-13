@@ -26,15 +26,15 @@ func (m *CommandUsage) Start(channels *replizer.Channels) {
 func (m *CommandUsage) getUsage(cargo interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewUsage()
 	args := o.NewGet()
-	// TODO: clean this.
-	fmt.Println("Username:", session.Username)
+	m.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {
-		fmt.Println("Error calling client.", err)
+		m.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
+		return nil
 	}
 	m.channels.ResponseChan <- string(resp)
 	return nil

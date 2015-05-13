@@ -30,14 +30,15 @@ func (g *CommandGetNotifyContacts) Start(channels *replizer.Channels) {
 func (g *CommandGetNotifyContacts) getNotifyContacts(cargs interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewNotificationContacts()
 	args := o.NewGet()
-	fmt.Println("Username:", session.Username)
+	g.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {
-		fmt.Println("Error calling client.", err)
+		g.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
+		return nil
 	}
 	g.channels.ResponseChan <- string(resp)
 	return nil
@@ -60,8 +61,8 @@ func (m *CommandSetNotifyContacts) setNotifyContactsEmail(cargo interface{}) sta
 	if ok {
 		c.Email = s
 	} else {
-		// TODO: clean this.
-		fmt.Println("assertion not ok")
+		m.channels.ResponseChan <- "Error asserting Contact."
+		return m.setNotifyContactsEmail(c)
 	}
 	return m.setNotifyContactsName(c)
 }
@@ -73,8 +74,8 @@ func (m *CommandSetNotifyContacts) setNotifyContactsName(cargo interface{}) stat
 	if ok {
 		c.Name = s
 	} else {
-		// TODO: clean this.
-		fmt.Println("asserton not ok")
+		m.channels.ResponseChan <- "Error asserting Contact."
+		return m.setNotifyContactsName(c)
 	}
 	return m.setNotifyContactsPhone(c)
 }
@@ -86,20 +87,29 @@ func (m *CommandSetNotifyContacts) setNotifyContactsPhone(cargo interface{}) sta
 	if ok {
 		c.Phone = s
 	} else {
-		// TODO: clean this.
-		fmt.Println("assertion not ok")
+		m.channels.ResponseChan <- "Error asserting Contact."
+		return m.setNotifyContactsPhone(c)
 	}
-	return m.setNotifyContactsValue(c)
+	return m.setNotifyContactsSendRequest(c)
 }
 
-func (m *CommandSetNotifyContacts) setNotifyContactsValue(cargo interface{}) statemachiner.StateFn {
-	//o := cloudsigma.NewNotificationPreferences()
-	//args := o.NewGet()
-	//client := &cloudsigma.Client{}
-	//resp, err := client.Call(args)
-	//if err != nil {
-	//	fmt.Println("Error calling client.", err)
-	//}
-	m.channels.ResponseChan <- "Not yet implemented"
+func (m *CommandSetNotifyContacts) setNotifyContactsSendRequest(cargo interface{}) statemachiner.StateFn {
+	o := cloudsigma.NewNotificationContacts()
+	c, ok := cargo.(cloudsigma.Contact)
+	if !ok {
+		m.channels.ResponseChan <- "Error asserting Contact."
+		return nil
+	}
+	args := o.NewSet(c)
+	args.Username = session.Username
+	args.Password = session.Password
+	args.Location = session.Location
+	client := &cloudsigma.Client{}
+	resp, err := client.Call(args)
+	if err != nil {
+		m.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
+		return nil
+	}
+	m.channels.ResponseChan <- string(resp)
 	return nil
 }

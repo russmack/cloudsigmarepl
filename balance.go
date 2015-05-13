@@ -26,16 +26,15 @@ func (m *CommandBalance) Start(channels *replizer.Channels) {
 func (m *CommandBalance) getBalance(cargo interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewBalance()
 	args := o.NewGet()
-	// TODO: do this better.
-	fmt.Println("Username:", session.Username)
+	m.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)
 	if err != nil {
-		// TODO: get rid of fmt.Println
-		fmt.Println("Error calling client.", err)
+		m.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
+		return nil
 	}
 	m.channels.ResponseChan <- string(resp)
 	return nil
