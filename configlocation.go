@@ -48,7 +48,7 @@ func (m *CommandSetConfigLocation) setConfigLocation(cargo interface{}) statemac
 	m.channels.PromptChan <- "Enter service location:"
 	s := <-m.channels.UserChan
 	if s != "zrh" && s != "hnl" && s != "wdc" && s != "sjs" {
-		m.channels.MessageChan <- "Unknown location.  Options: zrh | hnl | wdc | sjc"
+		m.channels.MessageChan <- "Unknown location.  Options: zrh | hnl | mia | sjc | wdc"
 		return m.setConfigLocation(cargo)
 	}
 	session.Location = s
