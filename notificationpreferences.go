@@ -12,7 +12,7 @@ type CommandGetNotifyPrefs struct {
 	channels *replizer.Channels
 }
 
-type CommandSetNotifyPrefs struct {
+type CommandEditNotifyPrefs struct {
 	channels *replizer.Channels
 }
 
@@ -20,8 +20,8 @@ func NewGetNotifyPrefs() *CommandGetNotifyPrefs {
 	return &CommandGetNotifyPrefs{}
 }
 
-func NewSetNotifyPrefs() *CommandSetNotifyPrefs {
-	return &CommandSetNotifyPrefs{}
+func NewEditNotifyPrefs() *CommandEditNotifyPrefs {
+	return &CommandEditNotifyPrefs{}
 }
 
 func (g *CommandGetNotifyPrefs) Start(channels *replizer.Channels) {
@@ -49,15 +49,15 @@ func (g *CommandGetNotifyPrefs) getNotifyPrefs(cargo interface{}) statemachiner.
 	return nil
 }
 
-func (m *CommandSetNotifyPrefs) Start(channels *replizer.Channels) {
+func (m *CommandEditNotifyPrefs) Start(channels *replizer.Channels) {
 	m.channels = channels
 	stateMachine := &statemachiner.StateMachine{}
-	stateMachine.StartState = m.setNotifyPrefsContact
+	stateMachine.StartState = m.editNotifyPrefsContact
 	cargo := cloudsigma.Preference{}
 	stateMachine.Start(cargo)
 }
 
-func (m *CommandSetNotifyPrefs) setNotifyPrefsContact(cargo interface{}) statemachiner.StateFn {
+func (m *CommandEditNotifyPrefs) editNotifyPrefsContact(cargo interface{}) statemachiner.StateFn {
 	// The state machine will not progress beyond this point until the repl
 	// pops from the promptChan.
 	m.channels.PromptChan <- "Contact:"
@@ -69,10 +69,10 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsContact(cargo interface{}) statema
 		m.channels.ResponseChan <- "Error asserting Preference."
 		return nil
 	}
-	return m.setNotifyPrefsMedium(c)
+	return m.editNotifyPrefsMedium(c)
 }
 
-func (m *CommandSetNotifyPrefs) setNotifyPrefsMedium(cargo interface{}) statemachiner.StateFn {
+func (m *CommandEditNotifyPrefs) editNotifyPrefsMedium(cargo interface{}) statemachiner.StateFn {
 	m.channels.PromptChan <- "Medium:"
 	s := <-m.channels.UserChan
 	c, ok := cargo.(cloudsigma.Preference)
@@ -82,10 +82,10 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsMedium(cargo interface{}) statemac
 		m.channels.ResponseChan <- "Error asserting Preference."
 		return nil
 	}
-	return m.setNotifyPrefsType(c)
+	return m.editNotifyPrefsType(c)
 }
 
-func (m *CommandSetNotifyPrefs) setNotifyPrefsType(cargo interface{}) statemachiner.StateFn {
+func (m *CommandEditNotifyPrefs) editNotifyPrefsType(cargo interface{}) statemachiner.StateFn {
 	m.channels.PromptChan <- "Type:"
 	s := <-m.channels.UserChan
 	c, ok := cargo.(cloudsigma.Preference)
@@ -96,10 +96,10 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsType(cargo interface{}) statemachi
 		// TODO: failed assertion should probably return the startFn.
 		return nil
 	}
-	return m.setNotifyPrefsValue(c)
+	return m.editNotifyPrefsValue(c)
 }
 
-func (m *CommandSetNotifyPrefs) setNotifyPrefsValue(cargo interface{}) statemachiner.StateFn {
+func (m *CommandEditNotifyPrefs) editNotifyPrefsValue(cargo interface{}) statemachiner.StateFn {
 	m.channels.PromptChan <- "Value (true|false):"
 	s := <-m.channels.UserChan
 	c, ok := cargo.(cloudsigma.Preference)
@@ -112,16 +112,17 @@ func (m *CommandSetNotifyPrefs) setNotifyPrefsValue(cargo interface{}) statemach
 			val = false
 		default:
 			m.channels.ResponseChan <- "Invalid input."
-			return m.setNotifyPrefsValue(c)
+			return m.editNotifyPrefsValue(c)
 		}
 		c.Value = val
 	} else {
 		m.channels.ResponseChan <- "Error asserting Preference."
 		return nil
 	}
-	return m.setNotifyPrefsSendRequest(c)
+	return m.editNotifyPrefsSendRequest(c)
 }
-func (m *CommandSetNotifyPrefs) setNotifyPrefsSendRequest(cargo interface{}) statemachiner.StateFn {
+
+func (m *CommandEditNotifyPrefs) editNotifyPrefsSendRequest(cargo interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewNotificationPreferences()
 	c, ok := cargo.(cloudsigma.Preference)
 	if !ok {
