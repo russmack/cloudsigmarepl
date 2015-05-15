@@ -30,13 +30,13 @@ func main() {
 
 	repl.AddCommand(&replizer.Command{
 		Instruction: "config location",
-		StartFn:     NewGetConfigLocation().Start,
+		StartFn:     ListConfigLocation().Start,
 		Help:        "Show the current location for the session.",
 	})
 
 	repl.AddCommand(&replizer.Command{
 		Instruction: "set config location",
-		StartFn:     NewSetConfigLocation().Start,
+		StartFn:     EditConfigLocation().Start,
 		Help:        "Set the location for the session.",
 	})
 
@@ -69,13 +69,19 @@ func main() {
 
 	repl.AddCommand(&replizer.Command{
 		Instruction: "notification contacts",
-		StartFn:     NewGetNotifyContacts().Start,
+		StartFn:     NewListNotifyContacts().Start,
+		Help:        "Request notification contacts.",
+	})
+
+	repl.AddCommand(&replizer.Command{
+		Instruction: "create notification contact",
+		StartFn:     NewCreateNotifyContacts().Start,
 		Help:        "Request notification contacts.",
 	})
 
 	repl.AddCommand(&replizer.Command{
 		Instruction: "notification preferences",
-		StartFn:     NewGetNotifyPrefs().Start,
+		StartFn:     NewListNotifyPrefs().Start,
 		Help:        "Request notification preferences for a specified contact.",
 	})
 

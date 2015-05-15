@@ -13,11 +13,11 @@ type CommandSetConfigLocation struct {
 	channels *replizer.Channels
 }
 
-func NewGetConfigLocation() *CommandGetConfigLocation {
+func ListConfigLocation() *CommandGetConfigLocation {
 	return &CommandGetConfigLocation{}
 }
 
-func NewSetConfigLocation() *CommandSetConfigLocation {
+func EditConfigLocation() *CommandSetConfigLocation {
 	return &CommandSetConfigLocation{}
 }
 
@@ -47,7 +47,7 @@ func (m *CommandSetConfigLocation) setConfigLocation(cargo interface{}) statemac
 	// pops from the promptChan.
 	m.channels.PromptChan <- "Enter service location:"
 	s := <-m.channels.UserChan
-	if s != "zrh" && s != "hnl" && s != "wdc" && s != "sjs" {
+	if s != "zrh" && s != "hnl" && s != "wdc" && s != "sjs" && s != "localhost" {
 		m.channels.MessageChan <- "Unknown location.  Options: zrh | hnl | mia | sjc | wdc"
 		return m.setConfigLocation(cargo)
 	}

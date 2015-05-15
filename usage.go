@@ -25,7 +25,7 @@ func (m *CommandUsage) Start(channels *replizer.Channels) {
 
 func (m *CommandUsage) getUsage(cargo interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewUsage()
-	args := o.NewGet()
+	args := o.List()
 	m.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
 	args.Username = session.Username
 	args.Password = session.Password

@@ -16,7 +16,7 @@ type CommandEditNotifyPrefs struct {
 	channels *replizer.Channels
 }
 
-func NewGetNotifyPrefs() *CommandGetNotifyPrefs {
+func NewListNotifyPrefs() *CommandGetNotifyPrefs {
 	return &CommandGetNotifyPrefs{}
 }
 
@@ -34,7 +34,7 @@ func (g *CommandGetNotifyPrefs) Start(channels *replizer.Channels) {
 
 func (g *CommandGetNotifyPrefs) getNotifyPrefs(cargo interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewNotificationPreferences()
-	args := o.NewGet()
+	args := o.List()
 	g.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
 	args.Username = session.Username
 	args.Password = session.Password
@@ -129,7 +129,7 @@ func (m *CommandEditNotifyPrefs) editNotifyPrefsSendRequest(cargo interface{}) s
 		m.channels.ResponseChan <- "Error asserting Preference."
 		return nil
 	}
-	args := o.NewSet(c)
+	args := o.Edit(c)
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location

@@ -82,7 +82,7 @@ func (m *CommandCreateServer) createServerMemory(cargo interface{}) statemachine
 
 func (m *CommandCreateServer) createServerVncPassword(cargo interface{}) statemachiner.StateFn {
 	//o := cloudsigma.NewCreateServer()
-	//args := o.NewGet()
+	//args := o.List()
 	//client := &cloudsigma.Client{}
 	//resp, err := client.Call(args)
 	//if err != nil {

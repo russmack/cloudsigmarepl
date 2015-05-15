@@ -7,29 +7,46 @@ import (
 	"github.com/russmack/statemachiner"
 )
 
-type CommandGetNotifyContacts struct {
+type CommandListNotifyContacts struct {
 	channels *replizer.Channels
 }
 
-type CommandSetNotifyContacts struct {
+type CommandCreateNotifyContacts struct {
 	channels *replizer.Channels
 }
 
-func NewGetNotifyContacts() *CommandGetNotifyContacts {
-	return &CommandGetNotifyContacts{}
+type CommandEditNotifyContacts struct {
+	channels *replizer.Channels
 }
 
-func (g *CommandGetNotifyContacts) Start(channels *replizer.Channels) {
+type ContactCargo struct {
+	Uuid string
+	Body cloudsigma.ContactRequest
+}
+
+func NewListNotifyContacts() *CommandListNotifyContacts {
+	return &CommandListNotifyContacts{}
+}
+
+func NewCreateNotifyContacts() *CommandCreateNotifyContacts {
+	return &CommandCreateNotifyContacts{}
+}
+
+func NewEditNotifyContacts() *CommandEditNotifyContacts {
+	return &CommandEditNotifyContacts{}
+}
+
+func (g *CommandListNotifyContacts) Start(channels *replizer.Channels) {
 	g.channels = channels
 	stateMachine := &statemachiner.StateMachine{}
-	stateMachine.StartState = g.getNotifyContacts
-	cargo := CommandGetNotifyContacts{}
+	stateMachine.StartState = g.listNotifyContacts
+	cargo := CommandListNotifyContacts{}
 	stateMachine.Start(cargo)
 }
 
-func (g *CommandGetNotifyContacts) getNotifyContacts(cargs interface{}) statemachiner.StateFn {
+func (g *CommandListNotifyContacts) listNotifyContacts(cargs interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewNotificationContacts()
-	args := o.NewGet()
+	args := o.List()
 	g.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
 	args.Username = session.Username
 	args.Password = session.Password
@@ -44,63 +61,169 @@ func (g *CommandGetNotifyContacts) getNotifyContacts(cargs interface{}) statemac
 	return nil
 }
 
-func (m *CommandSetNotifyContacts) Start(channels *replizer.Channels) {
+func (m *CommandCreateNotifyContacts) Start(channels *replizer.Channels) {
 	m.channels = channels
 	stateMachine := &statemachiner.StateMachine{}
-	stateMachine.StartState = m.setNotifyContactsEmail
-	cargo := cloudsigma.Contact{}
+	stateMachine.StartState = m.createNotifyContactsEmail
+	cargo := ContactCargo{}
 	stateMachine.Start(cargo)
 }
 
-func (m *CommandSetNotifyContacts) setNotifyContactsEmail(cargo interface{}) statemachiner.StateFn {
+func (m *CommandEditNotifyContacts) Start(channels *replizer.Channels) {
+	m.channels = channels
+	stateMachine := &statemachiner.StateMachine{}
+	stateMachine.StartState = m.editNotifyContactsEmail
+	cargo := ContactCargo{}
+	stateMachine.Start(cargo)
+}
+
+// Create contact state functions.
+
+func (m *CommandCreateNotifyContacts) createNotifyContactsUuid(cargo interface{}) statemachiner.StateFn {
+	// The state machine will not progress beyond this point until the repl
+	// pops from the promptChan.
+	m.channels.PromptChan <- "Contact uuid:"
+	s := <-m.channels.UserChan
+	c, ok := cargo.(ContactCargo)
+	if ok {
+		c.Uuid = s
+	} else {
+		m.channels.ResponseChan <- "Error asserting Contact."
+		return m.createNotifyContactsUuid(c)
+	}
+	return m.createNotifyContactsEmail(c)
+}
+
+func (m *CommandCreateNotifyContacts) createNotifyContactsEmail(cargo interface{}) statemachiner.StateFn {
 	// The state machine will not progress beyond this point until the repl
 	// pops from the promptChan.
 	m.channels.PromptChan <- "Email:"
 	s := <-m.channels.UserChan
-	c, ok := cargo.(cloudsigma.Contact)
+	c, ok := cargo.(ContactCargo)
 	if ok {
-		c.Email = s
+		c.Body.Email = s
 	} else {
 		m.channels.ResponseChan <- "Error asserting Contact."
-		return m.setNotifyContactsEmail(c)
+		return m.createNotifyContactsEmail(c)
 	}
-	return m.setNotifyContactsName(c)
+	return m.createNotifyContactsName(c)
 }
 
-func (m *CommandSetNotifyContacts) setNotifyContactsName(cargo interface{}) statemachiner.StateFn {
+func (m *CommandCreateNotifyContacts) createNotifyContactsName(cargo interface{}) statemachiner.StateFn {
 	m.channels.PromptChan <- "Name:"
 	s := <-m.channels.UserChan
-	c, ok := cargo.(cloudsigma.Contact)
+	c, ok := cargo.(ContactCargo)
 	if ok {
-		c.Name = s
+		c.Body.Name = s
 	} else {
 		m.channels.ResponseChan <- "Error asserting Contact."
-		return m.setNotifyContactsName(c)
+		return m.createNotifyContactsName(c)
 	}
-	return m.setNotifyContactsPhone(c)
+	return m.createNotifyContactsPhone(c)
 }
 
-func (m *CommandSetNotifyContacts) setNotifyContactsPhone(cargo interface{}) statemachiner.StateFn {
-	m.channels.PromptChan <- "Phone:"
+func (m *CommandCreateNotifyContacts) createNotifyContactsPhone(cargo interface{}) statemachiner.StateFn {
+	m.channels.PromptChan <- "Phone (must begin with +):"
 	s := <-m.channels.UserChan
-	c, ok := cargo.(cloudsigma.Contact)
+	c, ok := cargo.(ContactCargo)
 	if ok {
-		c.Phone = s
+		c.Body.Phone = s
 	} else {
 		m.channels.ResponseChan <- "Error asserting Contact."
-		return m.setNotifyContactsPhone(c)
+		return m.createNotifyContactsPhone(c)
 	}
-	return m.setNotifyContactsSendRequest(c)
+	return m.createNotifyContactsSendRequest(c)
 }
 
-func (m *CommandSetNotifyContacts) setNotifyContactsSendRequest(cargo interface{}) statemachiner.StateFn {
+func (m *CommandCreateNotifyContacts) createNotifyContactsSendRequest(cargo interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewNotificationContacts()
-	c, ok := cargo.(cloudsigma.Contact)
+	c, ok := cargo.(ContactCargo)
 	if !ok {
 		m.channels.ResponseChan <- "Error asserting Contact."
 		return nil
 	}
-	args := o.NewSet(c)
+	contacts := []cloudsigma.ContactRequest{c.Body}
+	args := o.Create(contacts)
+	args.Username = session.Username
+	args.Password = session.Password
+	args.Location = session.Location
+	client := &cloudsigma.Client{}
+	resp, err := client.Call(args)
+	if err != nil {
+		m.channels.MessageChan <- "Ensure phone begins with +"
+		m.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
+		return nil
+	}
+	m.channels.ResponseChan <- string(resp)
+	return nil
+}
+
+// Edit contact state functions.
+
+func (m *CommandEditNotifyContacts) editNotifyContactsUuid(cargo interface{}) statemachiner.StateFn {
+	// The state machine will not progress beyond this point until the repl
+	// pops from the promptChan.
+	m.channels.PromptChan <- "Contact uuid:"
+	s := <-m.channels.UserChan
+	c, ok := cargo.(ContactCargo)
+	if ok {
+		c.Uuid = s
+	} else {
+		m.channels.ResponseChan <- "Error asserting Contact."
+		return m.editNotifyContactsUuid(c)
+	}
+	return m.editNotifyContactsEmail(c)
+}
+
+func (m *CommandEditNotifyContacts) editNotifyContactsEmail(cargo interface{}) statemachiner.StateFn {
+	// The state machine will not progress beyond this point until the repl
+	// pops from the promptChan.
+	m.channels.PromptChan <- "Email:"
+	s := <-m.channels.UserChan
+	c, ok := cargo.(ContactCargo)
+	if ok {
+		c.Body.Email = s
+	} else {
+		m.channels.ResponseChan <- "Error asserting Contact."
+		return m.editNotifyContactsEmail(c)
+	}
+	return m.editNotifyContactsName(c)
+}
+
+func (m *CommandEditNotifyContacts) editNotifyContactsName(cargo interface{}) statemachiner.StateFn {
+	m.channels.PromptChan <- "Name:"
+	s := <-m.channels.UserChan
+	c, ok := cargo.(ContactCargo)
+	if ok {
+		c.Body.Name = s
+	} else {
+		m.channels.ResponseChan <- "Error asserting Contact."
+		return m.editNotifyContactsName(c)
+	}
+	return m.editNotifyContactsPhone(c)
+}
+
+func (m *CommandEditNotifyContacts) editNotifyContactsPhone(cargo interface{}) statemachiner.StateFn {
+	m.channels.PromptChan <- "Phone:"
+	s := <-m.channels.UserChan
+	c, ok := cargo.(ContactCargo)
+	if ok {
+		c.Body.Phone = s
+	} else {
+		m.channels.ResponseChan <- "Error asserting Contact."
+		return m.editNotifyContactsPhone(c)
+	}
+	return m.editNotifyContactsSendRequest(c)
+}
+
+func (m *CommandEditNotifyContacts) editNotifyContactsSendRequest(cargo interface{}) statemachiner.StateFn {
+	o := cloudsigma.NewNotificationContacts()
+	c, ok := cargo.(ContactCargo)
+	if !ok {
+		m.channels.ResponseChan <- "Error asserting Contact."
+		return nil
+	}
+	args := o.Edit(c.Uuid, c.Body)
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
