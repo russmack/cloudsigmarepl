@@ -88,7 +88,7 @@ func (m *CommandEditNotifyContacts) Start(channels *replizer.Channels) {
 func (m *CommandDeleteNotifyContacts) Start(channels *replizer.Channels) {
 	m.channels = channels
 	stateMachine := &statemachiner.StateMachine{}
-	//stateMachine.StartState = m.editNotifyContactsUuid
+	stateMachine.StartState = m.deleteNotifyContactsUuid
 	cargo := ContactCargo{}
 	stateMachine.Start(cargo)
 }
@@ -225,6 +225,42 @@ func (m *CommandEditNotifyContacts) editNotifyContactsSendRequest(cargo interfac
 		return nil
 	}
 	args := o.Edit(c.Uuid, c.Body)
+	args.Username = session.Username
+	args.Password = session.Password
+	args.Location = session.Location
+	client := &cloudsigma.Client{}
+	resp, err := client.Call(args)
+	if err != nil {
+		m.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
+		return nil
+	}
+	m.channels.ResponseChan <- string(resp)
+	return nil
+}
+
+// Delete contact state functions.
+
+func (m *CommandDeleteNotifyContacts) deleteNotifyContactsUuid(cargo interface{}) statemachiner.StateFn {
+	m.channels.PromptChan <- "Contact uuid:"
+	s := <-m.channels.UserChan
+	c, ok := cargo.(ContactCargo)
+	if ok {
+		c.Uuid = s
+	} else {
+		m.channels.ResponseChan <- "Error asserting Contact."
+		return m.deleteNotifyContactsUuid(c)
+	}
+	return m.deleteNotifyContactsSendRequest(c)
+}
+
+func (m *CommandDeleteNotifyContacts) deleteNotifyContactsSendRequest(cargo interface{}) statemachiner.StateFn {
+	o := cloudsigma.NewNotificationContacts()
+	c, ok := cargo.(ContactCargo)
+	if !ok {
+		m.channels.ResponseChan <- "Error asserting Contact."
+		return nil
+	}
+	args := o.Delete(c.Uuid)
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
