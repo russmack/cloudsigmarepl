@@ -76,7 +76,19 @@ func main() {
 	repl.AddCommand(&replizer.Command{
 		Instruction: "create notification contact",
 		StartFn:     NewCreateNotifyContacts().Start,
-		Help:        "Request notification contacts.",
+		Help:        "Create a notification contact.",
+	})
+
+	repl.AddCommand(&replizer.Command{
+		Instruction: "edit notification contact",
+		StartFn:     NewEditNotifyContacts().Start,
+		Help:        "Edit a notification contact.",
+	})
+
+	repl.AddCommand(&replizer.Command{
+		Instruction: "delete notification contact",
+		StartFn:     NewDeleteNotifyContacts().Start,
+		Help:        "Delete a notification contact.",
 	})
 
 	repl.AddCommand(&replizer.Command{

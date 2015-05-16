@@ -19,6 +19,10 @@ type CommandEditNotifyContacts struct {
 	channels *replizer.Channels
 }
 
+type CommandDeleteNotifyContacts struct {
+	channels *replizer.Channels
+}
+
 type ContactCargo struct {
 	Uuid string
 	Body cloudsigma.ContactRequest
@@ -34,6 +38,10 @@ func NewCreateNotifyContacts() *CommandCreateNotifyContacts {
 
 func NewEditNotifyContacts() *CommandEditNotifyContacts {
 	return &CommandEditNotifyContacts{}
+}
+
+func NewDeleteNotifyContacts() *CommandDeleteNotifyContacts {
+	return &CommandDeleteNotifyContacts{}
 }
 
 func (g *CommandListNotifyContacts) Start(channels *replizer.Channels) {
@@ -72,27 +80,20 @@ func (m *CommandCreateNotifyContacts) Start(channels *replizer.Channels) {
 func (m *CommandEditNotifyContacts) Start(channels *replizer.Channels) {
 	m.channels = channels
 	stateMachine := &statemachiner.StateMachine{}
-	stateMachine.StartState = m.editNotifyContactsEmail
+	stateMachine.StartState = m.editNotifyContactsUuid
+	cargo := ContactCargo{}
+	stateMachine.Start(cargo)
+}
+
+func (m *CommandDeleteNotifyContacts) Start(channels *replizer.Channels) {
+	m.channels = channels
+	stateMachine := &statemachiner.StateMachine{}
+	//stateMachine.StartState = m.editNotifyContactsUuid
 	cargo := ContactCargo{}
 	stateMachine.Start(cargo)
 }
 
 // Create contact state functions.
-
-func (m *CommandCreateNotifyContacts) createNotifyContactsUuid(cargo interface{}) statemachiner.StateFn {
-	// The state machine will not progress beyond this point until the repl
-	// pops from the promptChan.
-	m.channels.PromptChan <- "Contact uuid:"
-	s := <-m.channels.UserChan
-	c, ok := cargo.(ContactCargo)
-	if ok {
-		c.Uuid = s
-	} else {
-		m.channels.ResponseChan <- "Error asserting Contact."
-		return m.createNotifyContactsUuid(c)
-	}
-	return m.createNotifyContactsEmail(c)
-}
 
 func (m *CommandCreateNotifyContacts) createNotifyContactsEmail(cargo interface{}) statemachiner.StateFn {
 	// The state machine will not progress beyond this point until the repl
