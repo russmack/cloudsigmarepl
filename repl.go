@@ -27,82 +27,7 @@ func main() {
 	repl.Name = "CloudSigma IaaS"
 
 	// Create a statemachine per command available in the repl.
-
-	repl.AddCommand(&replizer.Command{
-		Instruction: "config location",
-		StartFn:     ListConfigLocation().Start,
-		Help:        "Show the current location for the session.",
-	})
-
-	repl.AddCommand(&replizer.Command{
-		Instruction: "set config location",
-		StartFn:     EditConfigLocation().Start,
-		Help:        "Set the location for the session.",
-	})
-
-	repl.AddCommand(&replizer.Command{
-		Instruction: "cloud status",
-		StartFn:     NewCloudStatus().Start,
-		Help:        "Get the status of the cloud.",
-	})
-
-	repl.AddCommand(&replizer.Command{
-		Instruction: "locations",
-		StartFn:     NewLocations().Start,
-		Help:        "Request available locations.",
-	})
-
-	repl.AddCommand(&replizer.Command{
-		Instruction: "usage",
-		StartFn:     NewUsage().Start,
-		// TODO: usage not in docs.
-		Help: "????",
-	})
-
-	repl.AddCommand(&replizer.Command{
-		Instruction: "balance",
-		StartFn:     NewBalance().Start,
-		Help:        "Request account balance.",
-	})
-
-	//repl.Add("create server", NewCreateServer().Start)
-
-	repl.AddCommand(&replizer.Command{
-		Instruction: "notification contacts",
-		StartFn:     NewListNotifyContacts().Start,
-		Help:        "Request notification contacts.",
-	})
-
-	repl.AddCommand(&replizer.Command{
-		Instruction: "create notification contact",
-		StartFn:     NewCreateNotifyContacts().Start,
-		Help:        "Create a notification contact.",
-	})
-
-	repl.AddCommand(&replizer.Command{
-		Instruction: "edit notification contact",
-		StartFn:     NewEditNotifyContacts().Start,
-		Help:        "Edit a notification contact.",
-	})
-
-	repl.AddCommand(&replizer.Command{
-		Instruction: "delete notification contact",
-		StartFn:     NewDeleteNotifyContacts().Start,
-		Help:        "Delete a notification contact.",
-	})
-
-	repl.AddCommand(&replizer.Command{
-		Instruction: "notification preferences",
-		StartFn:     NewListNotifyPrefs().Start,
-		Help:        "Request notification preferences for a specified contact.",
-	})
-
-	repl.AddCommand(&replizer.Command{
-		Instruction: "edit notification preferences",
-		StartFn:     NewEditNotifyPrefs().Start,
-		Help:        "Edit notification preferences for a specified contact.",
-	})
-
+	addCommands(repl)
 	repl.Start()
 }
 
@@ -117,4 +42,59 @@ func initSession() {
 	session = &Session{}
 	session.Username = config.Login().Username
 	session.Password = config.Login().Password
+}
+
+func addNewCommand(repl *replizer.Repl, instr string, startFn replizer.CommandStartFn, help string) {
+	repl.AddCommand(&replizer.Command{
+		Instruction: instr,
+		StartFn:     startFn,
+		Help:        help,
+	})
+}
+
+func addCommands(repl *replizer.Repl) {
+	// Config location
+	addNewCommand(repl, "config location", ListConfigLocation().Start,
+		"Show the current location for the session.")
+
+	addNewCommand(repl, "set config location", EditConfigLocation().Start,
+		"Set the location for the session.")
+
+	// Cloud
+	addNewCommand(repl, "cloud status", NewCloudStatus().Start,
+		"Get the status of the cloud.")
+
+	addNewCommand(repl, "locations", NewLocations().Start,
+		"Request available locations.")
+
+	// Billing
+	// TODO: usage not in docs.
+	addNewCommand(repl, "usage", NewUsage().Start,
+		"????")
+
+	addNewCommand(repl, "balance", NewBalance().Start,
+		"Request account balance.")
+
+	// Servers
+	//repl.Add("create server", NewCreateServer().Start)
+
+	// Notification Contacts
+	addNewCommand(repl, "notification contacts", NewListNotifyContacts().Start,
+		"Request notification contacts.")
+
+	addNewCommand(repl, "create notification contact", NewCreateNotifyContacts().Start,
+		"Create a notification contact.")
+
+	addNewCommand(repl, "edit notification contact", NewEditNotifyContacts().Start,
+		"Edit a notification contact.")
+
+	addNewCommand(repl, "delete notification contact", NewDeleteNotifyContacts().Start,
+		"Delete a notification contact.")
+
+	// Notification Preferences
+	addNewCommand(repl, "notification preferences", NewListNotifyPrefs().Start,
+		"Request notification preferences for a specified contact.")
+
+	addNewCommand(repl, "edit notification preferences", NewEditNotifyPrefs().Start,
+		"Edit notification preferences for a specified contact.")
 }
