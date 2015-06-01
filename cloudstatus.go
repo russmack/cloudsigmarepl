@@ -25,7 +25,7 @@ func (m *CommandCloudStatus) Start(channels *replizer.Channels) {
 
 func (m *CommandCloudStatus) getCloudStatus(cargo interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewCloudStatus()
-	args := o.List()
+	args := o.NewList()
 	args.Location = session.Location
 	client := &cloudsigma.Client{}
 	resp, err := client.Call(args)

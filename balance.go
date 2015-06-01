@@ -25,7 +25,7 @@ func (m *CommandBalance) Start(channels *replizer.Channels) {
 
 func (m *CommandBalance) getBalance(cargo interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewBalance()
-	args := o.List()
+	args := o.NewList()
 	m.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
 	args.Username = session.Username
 	args.Password = session.Password

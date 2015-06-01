@@ -54,7 +54,7 @@ func (g *CommandListNotifyContacts) Start(channels *replizer.Channels) {
 
 func (g *CommandListNotifyContacts) listNotifyContacts(cargs interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewNotificationContacts()
-	args := o.List()
+	args := o.NewList()
 	g.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
 	args.Username = session.Username
 	args.Password = session.Password
@@ -144,7 +144,7 @@ func (m *CommandCreateNotifyContacts) createNotifyContactsSendRequest(cargo inte
 		return nil
 	}
 	contacts := []cloudsigma.ContactRequest{c.Body}
-	args := o.Create(contacts)
+	args := o.NewCreate(contacts)
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
@@ -224,7 +224,7 @@ func (m *CommandEditNotifyContacts) editNotifyContactsSendRequest(cargo interfac
 		m.channels.ResponseChan <- "Error asserting Contact."
 		return nil
 	}
-	args := o.Edit(c.Uuid, c.Body)
+	args := o.NewEdit(c.Uuid, c.Body)
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
@@ -260,7 +260,7 @@ func (m *CommandDeleteNotifyContacts) deleteNotifyContactsSendRequest(cargo inte
 		m.channels.ResponseChan <- "Error asserting Contact."
 		return nil
 	}
-	args := o.Delete(c.Uuid)
+	args := o.NewDelete(c.Uuid)
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
