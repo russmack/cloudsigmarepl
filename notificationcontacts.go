@@ -52,7 +52,7 @@ func (g *CommandListNotifyContacts) Start(channels *replizer.Channels) {
 	stateMachine.Start(cargo)
 }
 
-func (g *CommandListNotifyContacts) listNotifyContacts(cargs interface{}) statemachiner.StateFn {
+func (g *CommandListNotifyContacts) listNotifyContacts(cargo interface{}) statemachiner.StateFn {
 	o := cloudsigma.NewNotificationContacts()
 	args := o.NewList()
 	g.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
