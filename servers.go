@@ -8,6 +8,10 @@ import (
 	"strconv"
 )
 
+type CommandListServers struct {
+	channels *replizer.Channels
+}
+
 type CommandCreateServer struct {
 	channels *replizer.Channels
 }
@@ -17,8 +21,37 @@ type CreateServerCargo struct {
 	Body cloudsigma.ServerRequest
 }
 
+func NewListServers() *CommandListServers {
+	return &CommandListServers{}
+}
+
 func NewCreateServer() *CommandCreateServer {
 	return &CommandCreateServer{}
+}
+
+func (m *CommandListServers) Start(channels *replizer.Channels) {
+	m.channels = channels
+	stateMachine := &statemachiner.StateMachine{}
+	stateMachine.StartState = m.listServers
+	cargo := CommandListServers{}
+	stateMachine.Start(cargo)
+}
+
+func (g *CommandListServers) listServers(cargo interface{}) statemachiner.StateFn {
+	o := cloudsigma.NewServers()
+	args := o.NewList()
+	g.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
+	args.Username = session.Username
+	args.Password = session.Password
+	args.Location = session.Location
+	client := &cloudsigma.Client{}
+	resp, err := client.Call(args)
+	if err != nil {
+		g.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
+		return nil
+	}
+	g.channels.ResponseChan <- string(resp)
+	return nil
 }
 
 func (m *CommandCreateServer) Start(channels *replizer.Channels) {

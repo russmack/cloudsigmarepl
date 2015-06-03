@@ -76,6 +76,8 @@ func addCommands(repl *replizer.Repl) {
 		"Request account balance.")
 
 	// Servers
+	addNewCommand(repl, "list servers", NewListServers().Start,
+		"List all servers.")
 	addNewCommand(repl, "create server", NewCreateServer().Start,
 		"Create a new server.")
 
