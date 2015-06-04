@@ -80,6 +80,8 @@ func addCommands(repl *replizer.Repl) {
 		"List all servers.")
 	addNewCommand(repl, "start server", NewStartServer().Start,
 		"Start a server.")
+	addNewCommand(repl, "stop server", NewStopServer().Start,
+		"Stop a server.")
 	addNewCommand(repl, "create server", NewCreateServer().Start,
 		"Create a new server.")
 
