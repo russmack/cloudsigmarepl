@@ -70,7 +70,7 @@ func addCommands(repl *replizer.Repl) {
 	// Billing
 	// TODO: usage not in docs.
 	addNewCommand(repl, "usage", NewUsage().Start,
-		"????")
+		"Not in docs.")
 
 	addNewCommand(repl, "balance", NewBalance().Start,
 		"Request account balance.")
@@ -84,6 +84,12 @@ func addCommands(repl *replizer.Repl) {
 		"Stop a server.")
 	addNewCommand(repl, "create server", NewCreateServer().Start,
 		"Create a new server.")
+
+	// Drives
+	addNewCommand(repl, "list drives", NewListDrives().Start,
+		"List all drives.")
+	addNewCommand(repl, "create drive", NewCreateDrive().Start,
+		"Create a new drive.")
 
 	// Notification Contacts
 	addNewCommand(repl, "notification contacts", NewListNotifyContacts().Start,
