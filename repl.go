@@ -25,6 +25,7 @@ func main() {
 	// Create the repl, add command state machines, and start the repl.
 	repl := replizer.NewRepl()
 	repl.Name = "CloudSigma IaaS"
+	repl.FormatResponse = replizer.PrettyJson
 
 	// Create a statemachine per command available in the repl.
 	addCommands(repl)
