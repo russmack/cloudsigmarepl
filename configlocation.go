@@ -52,6 +52,6 @@ func (m *CommandSetConfigLocation) setConfigLocation(cargo interface{}) statemac
 		return m.setConfigLocation(cargo)
 	}
 	session.Location = s
-	m.channels.ResponseChan <- s
+	m.channels.ResponseChan <- "{ \"location\": \"" + s + "\" }"
 	return nil
 }
