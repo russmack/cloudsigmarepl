@@ -53,6 +53,7 @@ Bye!
 - [X] Cloud status
 - [X] Locations
 - [X] Capabilities
+- [X] Profile
 - [X] Balance
 - [X] Current usage
 - [X] Burst usage
@@ -61,6 +62,8 @@ Bye!
 - [X] Notification contacts [list, create, edit, delete]
 - [X] Servers [list, create, start, stop]
 - [X] Drives [list, create]
+- [X] Vlans
+- [X] IP addresses
 
 ## License
 BSD 3-Clause: [LICENSE.txt](LICENSE.txt)
