@@ -55,6 +55,7 @@ Bye!
 - [X] Current usage
 - [X] Burst usage
 - [X] Daily usage
+- [X] Licenses
 - [X] Notification preferences [list, edit]
 - [X] Notification contacts [list, create, edit, delete]
 - [X] Servers [list, create, start, stop]

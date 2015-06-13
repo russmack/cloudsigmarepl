@@ -85,6 +85,8 @@ func addCommands(repl *replizer.Repl) {
 		"Request burst usage.")
 	addNewCommand(repl, "daily burst usage", NewDailyBurstUsage().Start,
 		"Request daily burst usage.")
+	addNewCommand(repl, "licenses", NewListLicenses().Start,
+		"List licenses.")
 
 	// Servers
 	addNewCommand(repl, "list servers", NewListServers().Start,
