@@ -4,10 +4,6 @@ A REPL for the CloudSigma IaaS REST API.
 
 [![Build Status](https://travis-ci.org/russmack/cloudsigmarepl.svg?branch=master)](https://travis-ci.org/russmack/cloudsigmarepl)
 
----
-#### Status: Started.
----
-
 ## Usage
 ```
 Set your login in the config.json.
@@ -55,6 +51,7 @@ Bye!
 - [X] Capabilities
 - [X] Profile
 - [X] Balance
+- [X] Pricing
 - [X] Current usage
 - [X] Burst usage
 - [X] Daily usage
