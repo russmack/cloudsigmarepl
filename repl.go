@@ -100,8 +100,10 @@ func addCommands(repl *replizer.Repl) {
 		"Create a new drive.")
 
 	// Network
-	addNewCommand(repl, "list vlans", NewVlans().Start,
+	addNewCommand(repl, "list vlans", NewListVlans().Start,
 		"List vlans.")
+	addNewCommand(repl, "list ips", NewListIps().Start,
+		"List IP addresses.")
 
 	// Notification Contacts
 	addNewCommand(repl, "notification contacts", NewListNotifyContacts().Start,

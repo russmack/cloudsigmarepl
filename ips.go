@@ -7,24 +7,24 @@ import (
 	"github.com/russmack/statemachiner"
 )
 
-type CommandListVlans struct {
+type CommandListIps struct {
 	channels *replizer.Channels
 }
 
-func NewListVlans() *CommandListVlans {
-	return &CommandListVlans{}
+func NewListIps() *CommandListIps {
+	return &CommandListIps{}
 }
 
-func (m *CommandListVlans) Start(channels *replizer.Channels) {
+func (m *CommandListIps) Start(channels *replizer.Channels) {
 	m.channels = channels
 	stateMachine := &statemachiner.StateMachine{}
-	stateMachine.StartState = m.listVlans
-	cargo := CommandListVlans{}
+	stateMachine.StartState = m.listIps
+	cargo := CommandListIps{}
 	stateMachine.Start(cargo)
 }
 
-func (m *CommandListVlans) listVlans(cargo interface{}) statemachiner.StateFn {
-	o := cloudsigma.NewVlans()
+func (m *CommandListIps) listIps(cargo interface{}) statemachiner.StateFn {
+	o := cloudsigma.NewIps()
 	args := o.NewList()
 	m.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
 	args.Username = session.Username
