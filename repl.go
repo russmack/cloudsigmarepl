@@ -73,7 +73,8 @@ func addCommands(repl *replizer.Repl) {
 	// TODO: usage not in docs.
 	addNewCommand(repl, "usage", NewUsage().Start,
 		"Not in docs.")
-
+	addNewCommand(repl, "profile", NewProfile().Start,
+		"Request profile.")
 	addNewCommand(repl, "balance", NewBalance().Start,
 		"Request account balance.")
 	addNewCommand(repl, "current usage", NewCurrentUsage().Start,
