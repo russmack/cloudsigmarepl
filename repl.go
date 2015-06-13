@@ -99,23 +99,23 @@ func addCommands(repl *replizer.Repl) {
 	addNewCommand(repl, "create drive", NewCreateDrive().Start,
 		"Create a new drive.")
 
+	// Network
+	addNewCommand(repl, "list vlans", NewVlans().Start,
+		"List vlans.")
+
 	// Notification Contacts
 	addNewCommand(repl, "notification contacts", NewListNotifyContacts().Start,
 		"Request notification contacts.")
-
 	addNewCommand(repl, "create notification contact", NewCreateNotifyContacts().Start,
 		"Create a notification contact.")
-
 	addNewCommand(repl, "edit notification contact", NewEditNotifyContacts().Start,
 		"Edit a notification contact.")
-
 	addNewCommand(repl, "delete notification contact", NewDeleteNotifyContacts().Start,
 		"Delete a notification contact.")
 
 	// Notification Preferences
 	addNewCommand(repl, "notification preferences", NewListNotifyPrefs().Start,
 		"Request notification preferences for a specified contact.")
-
 	addNewCommand(repl, "edit notification preferences", NewEditNotifyPrefs().Start,
 		"Edit notification preferences for a specified contact.")
 }
