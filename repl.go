@@ -64,9 +64,10 @@ func addCommands(repl *replizer.Repl) {
 	// Cloud
 	addNewCommand(repl, "cloud status", NewCloudStatus().Start,
 		"Get the status of the cloud.")
-
 	addNewCommand(repl, "locations", NewLocations().Start,
 		"Request available locations.")
+	addNewCommand(repl, "capabilities", NewCapabilities().Start,
+		"Request location's capabilities.")
 
 	// Billing
 	// TODO: usage not in docs.
