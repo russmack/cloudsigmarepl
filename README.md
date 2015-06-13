@@ -52,6 +52,7 @@ Bye!
 - [X] Profile
 - [X] Balance
 - [X] Subscriptions
+- [X] Transactions
 - [X] Pricing
 - [X] Current usage
 - [X] Burst usage

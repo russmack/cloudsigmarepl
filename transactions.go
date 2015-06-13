@@ -7,24 +7,24 @@ import (
 	"github.com/russmack/statemachiner"
 )
 
-type CommandListTransactions struct {
+type CommandListSubscriptions struct {
 	channels *replizer.Channels
 }
 
-func NewListTransactions() *CommandListTransactions {
-	return &CommandListTransactions{}
+func NewListSubscriptions() *CommandListSubscriptions {
+	return &CommandListSubscriptions{}
 }
 
-func (m *CommandListTransactions) Start(channels *replizer.Channels) {
+func (m *CommandListSubscriptions) Start(channels *replizer.Channels) {
 	m.channels = channels
 	stateMachine := &statemachiner.StateMachine{}
-	stateMachine.StartState = m.listTransactions
-	cargo := CommandListTransactions{}
+	stateMachine.StartState = m.listSubscriptions
+	cargo := CommandListSubscriptions{}
 	stateMachine.Start(cargo)
 }
 
-func (m *CommandListTransactions) listTransactions(cargo interface{}) statemachiner.StateFn {
-	o := cloudsigma.NewTransactions()
+func (m *CommandListSubscriptions) listSubscriptions(cargo interface{}) statemachiner.StateFn {
+	o := cloudsigma.NewSubscriptions()
 	args := o.NewList()
 	m.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
 	args.Username = session.Username
