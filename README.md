@@ -48,6 +48,20 @@ Response:
 Bye!
 ```
 
+## Features
+
+- [X] Cloud status
+- [X] Locations
+- [X] Capabilities
+- [X] Balance
+- [X] Current usage
+- [X] Burst usage
+- [X] Daily usage
+- [X] Notification preferences [list, edit]
+- [X] Notification contacts [list, create, edit, delete]
+- [X] Servers [list, create, start, stop]
+- [X] Drives [list, create]
+
 ## License
 BSD 3-Clause: [LICENSE.txt](LICENSE.txt)
 
