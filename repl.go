@@ -75,6 +75,8 @@ func addCommands(repl *replizer.Repl) {
 
 	addNewCommand(repl, "balance", NewBalance().Start,
 		"Request account balance.")
+	addNewCommand(repl, "current usage", NewCurrentUsage().Start,
+		"Request current usage.")
 
 	// Servers
 	addNewCommand(repl, "list servers", NewListServers().Start,
