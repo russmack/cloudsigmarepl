@@ -77,6 +77,8 @@ func addCommands(repl *replizer.Repl) {
 		"Request profile.")
 	addNewCommand(repl, "balance", NewBalance().Start,
 		"Request account balance.")
+	addNewCommand(repl, "list subscriptions", NewListSubscriptions().Start,
+		"List subscriptions.")
 	addNewCommand(repl, "pricing", NewListPricing().Start,
 		"Request pricing.")
 	addNewCommand(repl, "current usage", NewCurrentUsage().Start,

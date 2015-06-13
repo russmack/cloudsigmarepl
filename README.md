@@ -51,6 +51,7 @@ Bye!
 - [X] Capabilities
 - [X] Profile
 - [X] Balance
+- [X] Subscriptions
 - [X] Pricing
 - [X] Current usage
 - [X] Burst usage
