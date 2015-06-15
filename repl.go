@@ -45,6 +45,17 @@ func initSession() {
 	session.Password = config.Login().Password
 }
 
+func sendRequest(channels *replizer.Channels, args *cloudsigma.Args) error {
+	client := &cloudsigma.Client{}
+	resp, err := client.Call(nil, args)
+	if err != nil {
+		channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
+		return err
+	}
+	channels.ResponseChan <- string(resp)
+	return nil
+}
+
 func addNewCommand(repl *replizer.Repl, instr string, startFn replizer.CommandStartFn, help string) {
 	repl.AddCommand(&replizer.Command{
 		Instruction: instr,
@@ -57,7 +68,6 @@ func addCommands(repl *replizer.Repl) {
 	// Config location
 	addNewCommand(repl, "config location", ListConfigLocation().Start,
 		"Show the current location for the session.")
-
 	addNewCommand(repl, "set config location", EditConfigLocation().Start,
 		"Set the location for the session.")
 

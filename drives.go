@@ -57,13 +57,7 @@ func (g *CommandListDrives) listDrives(cargo interface{}) statemachiner.StateFn 
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
-	client := &cloudsigma.Client{}
-	resp, err := client.Call(args)
-	if err != nil {
-		g.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
-		return nil
-	}
-	g.channels.ResponseChan <- string(resp)
+	_ = sendRequest(g.channels, args)
 	return nil
 }
 
@@ -152,13 +146,7 @@ func (m *CommandStopServer) stopServerSendRequest(cargo interface{}) statemachin
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
-	client := &cloudsigma.Client{}
-	resp, err := client.Call(args)
-	if err != nil {
-		m.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
-		return nil
-	}
-	m.channels.ResponseChan <- string(resp)
+	_ = sendRequest(m.channels, args)
 	return nil
 }
 */
@@ -237,12 +225,6 @@ func (m *CommandCreateDrive) createDriveSendRequest(cargo interface{}) statemach
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
-	client := &cloudsigma.Client{}
-	resp, err := client.Call(args)
-	if err != nil {
-		m.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
-		return nil
-	}
-	m.channels.ResponseChan <- string(resp)
+	_ = sendRequest(m.channels, args)
 	return nil
 }

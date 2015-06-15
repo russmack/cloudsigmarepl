@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/russmack/cloudsigma"
 	"github.com/russmack/replizer"
 	"github.com/russmack/statemachiner"
@@ -27,12 +26,6 @@ func (m *CommandLocations) getLocations(cargo interface{}) statemachiner.StateFn
 	o := cloudsigma.NewLocations()
 	args := o.NewList()
 	args.Location = session.Location
-	client := &cloudsigma.Client{}
-	resp, err := client.Call(args)
-	if err != nil {
-		m.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
-		return nil
-	}
-	m.channels.ResponseChan <- string(resp)
+	_ = sendRequest(m.channels, args)
 	return nil
 }

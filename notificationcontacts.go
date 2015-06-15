@@ -59,13 +59,7 @@ func (g *CommandListNotifyContacts) listNotifyContacts(cargo interface{}) statem
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
-	client := &cloudsigma.Client{}
-	resp, err := client.Call(args)
-	if err != nil {
-		g.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
-		return nil
-	}
-	g.channels.ResponseChan <- string(resp)
+	_ = sendRequest(g.channels, args)
 	return nil
 }
 
@@ -148,14 +142,10 @@ func (m *CommandCreateNotifyContacts) createNotifyContactsSendRequest(cargo inte
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
-	client := &cloudsigma.Client{}
-	resp, err := client.Call(args)
+	err := sendRequest(m.channels, args)
 	if err != nil {
 		m.channels.MessageChan <- "Ensure phone begins with +"
-		m.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
-		return nil
 	}
-	m.channels.ResponseChan <- string(resp)
 	return nil
 }
 
@@ -228,13 +218,8 @@ func (m *CommandEditNotifyContacts) editNotifyContactsSendRequest(cargo interfac
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
-	client := &cloudsigma.Client{}
-	resp, err := client.Call(args)
-	if err != nil {
-		m.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
-		return nil
-	}
-	m.channels.ResponseChan <- string(resp)
+	_ = sendRequest(m.channels, args)
+	return nil
 	return nil
 }
 
@@ -264,12 +249,7 @@ func (m *CommandDeleteNotifyContacts) deleteNotifyContactsSendRequest(cargo inte
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location
-	client := &cloudsigma.Client{}
-	resp, err := client.Call(args)
-	if err != nil {
-		m.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
-		return nil
-	}
-	m.channels.ResponseChan <- string(resp)
+	_ = sendRequest(m.channels, args)
+	return nil
 	return nil
 }
