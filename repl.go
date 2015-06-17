@@ -93,6 +93,8 @@ func addCommands(repl *replizer.Repl) {
 		"List transactions.")
 	addNewCommand(repl, "pricing", NewListPricing().Start,
 		"Request pricing.")
+	addNewCommand(repl, "discounts", NewListDiscounts().Start,
+		"List discounts.")
 	addNewCommand(repl, "current usage", NewCurrentUsage().Start,
 		"Request current usage.")
 	addNewCommand(repl, "burst usage", NewBurstUsage().Start,
