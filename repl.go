@@ -120,6 +120,10 @@ func addCommands(repl *replizer.Repl) {
 	addNewCommand(repl, "create drive", NewCreateDrive().Start,
 		"Create a new drive.")
 
+	// Snapshots
+	addNewCommand(repl, "list snapshots", NewListSnapshots().Start,
+		"List all snapshots.")
+
 	// Network
 	addNewCommand(repl, "list vlans", NewListVlans().Start,
 		"List vlans.")
