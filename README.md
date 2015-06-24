@@ -61,10 +61,12 @@ Bye!
 - [X] Licenses
 - [X] Notification preferences [list, edit]
 - [X] Notification contacts [list, create, edit, delete]
-- [X] Servers [list, create, start, stop]
+- [X] Servers [list, create, delete, start, stop, shutdown]
 - [X] Drives [list, create]
+- [X] Snapshots [list]
 - [X] Vlans
 - [X] IP addresses
+- [X] Access Control Lists [list]
 
 ## License
 BSD 3-Clause: [LICENSE.txt](LICENSE.txt)

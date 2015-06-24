@@ -149,4 +149,9 @@ func addCommands(repl *replizer.Repl) {
 		"Request notification preferences for a specified contact.")
 	addNewCommand(repl, "edit notification preferences", NewEditNotifyPrefs().Start,
 		"Edit notification preferences for a specified contact.")
+
+	// Access Control Lists
+	addNewCommand(repl, "list acls", NewListAcls().Start,
+		"List access control lists.")
+
 }
