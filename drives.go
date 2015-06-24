@@ -11,14 +11,10 @@ import (
 type CommandListDrives struct {
 	channels *replizer.Channels
 }
-
-// type CommandStartServer struct {
-// 	channels *replizer.Channels
-// }
-// type CommandStopServer struct {
-// 	channels *replizer.Channels
-// }
 type CommandCreateDrive struct {
+	channels *replizer.Channels
+}
+type CommandDeleteDrive struct {
 	channels *replizer.Channels
 }
 
@@ -30,13 +26,9 @@ type DriveCargo struct {
 func NewListDrives() *CommandListDrives {
 	return &CommandListDrives{}
 }
-
-// func NewStartServer() *CommandStartServer {
-// 	return &CommandStartServer{}
-// }
-// func NewStopServer() *CommandStopServer {
-// 	return &CommandStopServer{}
-// }
+func NewDeleteDrive() *CommandDeleteDrive {
+	return &CommandDeleteDrive{}
+}
 func NewCreateDrive() *CommandCreateDrive {
 	return &CommandCreateDrive{}
 }
@@ -60,96 +52,6 @@ func (g *CommandListDrives) listDrives(cargo interface{}) statemachiner.StateFn 
 	_ = sendRequest(g.channels, args)
 	return nil
 }
-
-/*
-// Start is the start state of the CommandStartServer state machine.
-func (m *CommandStartServer) Start(channels *replizer.Channels) {
-	m.channels = channels
-	stateMachine := &statemachiner.StateMachine{}
-	stateMachine.StartState = m.startServerUuid
-	cargo := DriveCargo{}
-	stateMachine.Start(cargo)
-}
-
-func (m *CommandStartServer) startServerUuid(cargo interface{}) statemachiner.StateFn {
-	// The state machine will not progress beyond this point until the repl
-	// pops from the promptChan.
-	m.channels.PromptChan <- "Uuid:"
-	n := <-m.channels.UserChan
-	c, ok := cargo.(DriveCargo)
-	if ok {
-		c.Uuid = n
-	} else {
-		m.channels.ResponseChan <- "Error asserting Drive."
-		return m.startServerUuid(c)
-	}
-	return m.startServerSendRequest(c)
-}
-
-func (m *CommandStartServer) startServerSendRequest(cargo interface{}) statemachiner.StateFn {
-	o := cloudsigma.NewServers()
-	c, ok := cargo.(DriveCargo)
-	if !ok {
-		m.channels.ResponseChan <- "Error asserting Drive."
-		return nil
-	}
-
-	args := o.NewStart(c.Uuid)
-	m.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
-	args.Username = session.Username
-	args.Password = session.Password
-	args.Location = session.Location
-	client := &cloudsigma.Client{}
-	resp, err := client.Call(args)
-	if err != nil {
-		m.channels.ResponseChan <- fmt.Sprintf("Error calling client. %s", err)
-		return nil
-	}
-	m.channels.ResponseChan <- string(resp)
-	return nil
-}
-
-// Start is the start state of the CommandStopServer state machine.
-func (m *CommandStopServer) Start(channels *replizer.Channels) {
-	m.channels = channels
-	stateMachine := &statemachiner.StateMachine{}
-	stateMachine.StartState = m.stopServerUuid
-	cargo := DriveCargo{}
-	stateMachine.Start(cargo)
-}
-
-func (m *CommandStopServer) stopServerUuid(cargo interface{}) statemachiner.StateFn {
-	// The state machine will not progress beyond this point until the repl
-	// pops from the promptChan.
-	m.channels.PromptChan <- "Uuid:"
-	n := <-m.channels.UserChan
-	c, ok := cargo.(DriveCargo)
-	if ok {
-		c.Uuid = n
-	} else {
-		m.channels.ResponseChan <- "Error asserting Drive."
-		return m.stopServerUuid(c)
-	}
-	return m.stopServerSendRequest(c)
-}
-
-func (m *CommandStopServer) stopServerSendRequest(cargo interface{}) statemachiner.StateFn {
-	o := cloudsigma.NewServers()
-	c, ok := cargo.(DriveCargo)
-	if !ok {
-		m.channels.ResponseChan <- "Error asserting Drive."
-		return nil
-	}
-
-	args := o.NewStop(c.Uuid)
-	m.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
-	args.Username = session.Username
-	args.Password = session.Password
-	args.Location = session.Location
-	_ = sendRequest(m.channels, args)
-	return nil
-}
-*/
 
 // Start is the start state of the CommandCreateDrive state machine.
 func (m *CommandCreateDrive) Start(channels *replizer.Channels) {
@@ -222,6 +124,47 @@ func (m *CommandCreateDrive) createDriveSendRequest(cargo interface{}) statemach
 		cloudsigma.DriveRequest{c.Body.Media, c.Body.Name, c.Body.Size},
 	}
 	args := o.NewCreate(newDrives)
+	args.Username = session.Username
+	args.Password = session.Password
+	args.Location = session.Location
+	_ = sendRequest(m.channels, args)
+	return nil
+}
+
+// Start is the start state of the CommandDeleteDrive state machine.
+func (m *CommandDeleteDrive) Start(channels *replizer.Channels) {
+	m.channels = channels
+	stateMachine := &statemachiner.StateMachine{}
+	stateMachine.StartState = m.deleteDriveUuid
+	cargo := DriveCargo{}
+	stateMachine.Start(cargo)
+}
+
+func (m *CommandDeleteDrive) deleteDriveUuid(cargo interface{}) statemachiner.StateFn {
+	// The state machine will not progress beyond this point until the repl
+	// pops from the promptChan.
+	m.channels.PromptChan <- "Uuid:"
+	n := <-m.channels.UserChan
+	c, ok := cargo.(DriveCargo)
+	if ok {
+		c.Uuid = n
+	} else {
+		m.channels.ResponseChan <- "Error asserting Drive."
+		return m.deleteDriveUuid(c)
+	}
+	return m.deleteDriveSendRequest(c)
+}
+
+func (m *CommandDeleteDrive) deleteDriveSendRequest(cargo interface{}) statemachiner.StateFn {
+	o := cloudsigma.NewDrives()
+	c, ok := cargo.(DriveCargo)
+	if !ok {
+		m.channels.ResponseChan <- "Error asserting Drive."
+		return nil
+	}
+
+	args := o.NewDelete(c.Uuid)
+	m.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
 	args.Username = session.Username
 	args.Password = session.Password
 	args.Location = session.Location

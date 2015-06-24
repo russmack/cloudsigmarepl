@@ -123,6 +123,8 @@ func addCommands(repl *replizer.Repl) {
 		"List all drives.")
 	addNewCommand(repl, "create drive", NewCreateDrive().Start,
 		"Create a new drive.")
+	addNewCommand(repl, "delete drive", NewDeleteDrive().Start,
+		"Delete a drive.")
 
 	// Snapshots
 	addNewCommand(repl, "list snapshots", NewListSnapshots().Start,
