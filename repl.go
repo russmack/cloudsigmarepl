@@ -133,6 +133,8 @@ func addCommands(repl *replizer.Repl) {
 	// Network
 	addNewCommand(repl, "list vlans", NewListVlans().Start,
 		"List vlans.")
+	addNewCommand(repl, "list vlans detailed", NewListVlansDetailed().Start,
+		"List vlans detailed.")
 	addNewCommand(repl, "list ips", NewListIps().Start,
 		"List IP addresses.")
 

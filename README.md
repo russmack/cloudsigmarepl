@@ -62,9 +62,9 @@ Bye!
 - [X] Notification preferences [list, edit]
 - [X] Notification contacts [list, create, edit, delete]
 - [X] Servers [list, create, delete, start, stop, shutdown]
-- [X] Drives [list, create]
+- [X] Drives [list, create, delete]
 - [X] Snapshots [list]
-- [X] Vlans
+- [X] Vlans [list, detailed list]
 - [X] IP addresses
 - [X] Access Control Lists [list]
 
