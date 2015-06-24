@@ -54,6 +54,7 @@ Bye!
 - [X] Subscriptions
 - [X] Transactions
 - [X] Pricing
+- [X] Discounts
 - [X] Current usage
 - [X] Burst usage
 - [X] Daily usage
