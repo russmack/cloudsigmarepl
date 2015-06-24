@@ -17,6 +17,9 @@ type CommandStartServer struct {
 type CommandStopServer struct {
 	channels *replizer.Channels
 }
+type CommandShutdownServer struct {
+	channels *replizer.Channels
+}
 type CommandCreateServer struct {
 	channels *replizer.Channels
 }
@@ -34,6 +37,9 @@ func NewStartServer() *CommandStartServer {
 }
 func NewStopServer() *CommandStopServer {
 	return &CommandStopServer{}
+}
+func NewShutdownServer() *CommandShutdownServer {
+	return &CommandShutdownServer{}
 }
 func NewCreateServer() *CommandCreateServer {
 	return &CommandCreateServer{}
@@ -133,6 +139,47 @@ func (m *CommandStopServer) stopServerSendRequest(cargo interface{}) statemachin
 	}
 
 	args := o.NewStop(c.Uuid)
+	m.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
+	args.Username = session.Username
+	args.Password = session.Password
+	args.Location = session.Location
+	_ = sendRequest(m.channels, args)
+	return nil
+}
+
+// Start is the start state of the CommandShutdownServer state machine.
+func (m *CommandShutdownServer) Start(channels *replizer.Channels) {
+	m.channels = channels
+	stateMachine := &statemachiner.StateMachine{}
+	stateMachine.StartState = m.shutdownServerUuid
+	cargo := ServerCargo{}
+	stateMachine.Start(cargo)
+}
+
+func (m *CommandShutdownServer) shutdownServerUuid(cargo interface{}) statemachiner.StateFn {
+	// The state machine will not progress beyond this point until the repl
+	// pops from the promptChan.
+	m.channels.PromptChan <- "Uuid:"
+	n := <-m.channels.UserChan
+	c, ok := cargo.(ServerCargo)
+	if ok {
+		c.Uuid = n
+	} else {
+		m.channels.ResponseChan <- "Error asserting Server."
+		return m.shutdownServerUuid(c)
+	}
+	return m.shutdownServerSendRequest(c)
+}
+
+func (m *CommandShutdownServer) shutdownServerSendRequest(cargo interface{}) statemachiner.StateFn {
+	o := cloudsigma.NewServers()
+	c, ok := cargo.(ServerCargo)
+	if !ok {
+		m.channels.ResponseChan <- "Error asserting Server."
+		return nil
+	}
+
+	args := o.NewShutdown(c.Uuid)
 	m.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
 	args.Username = session.Username
 	args.Password = session.Password
