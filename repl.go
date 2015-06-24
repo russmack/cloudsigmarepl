@@ -115,6 +115,8 @@ func addCommands(repl *replizer.Repl) {
 		"Shutdown a server.")
 	addNewCommand(repl, "create server", NewCreateServer().Start,
 		"Create a new server.")
+	addNewCommand(repl, "delete server", NewDeleteServer().Start,
+		"Delete a server.")
 
 	// Drives
 	addNewCommand(repl, "list drives", NewListDrives().Start,
