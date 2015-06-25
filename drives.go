@@ -11,6 +11,12 @@ import (
 type CommandListDrives struct {
 	channels *replizer.Channels
 }
+type CommandListDrivesDetailed struct {
+	channels *replizer.Channels
+}
+type CommandGetDrive struct {
+	channels *replizer.Channels
+}
 type CommandCreateDrive struct {
 	channels *replizer.Channels
 }
@@ -25,6 +31,12 @@ type DriveCargo struct {
 
 func NewListDrives() *CommandListDrives {
 	return &CommandListDrives{}
+}
+func NewListDrivesDetailed() *CommandListDrivesDetailed {
+	return &CommandListDrivesDetailed{}
+}
+func NewGetDrive() *CommandGetDrive {
+	return &CommandGetDrive{}
 }
 func NewDeleteDrive() *CommandDeleteDrive {
 	return &CommandDeleteDrive{}
@@ -50,6 +62,64 @@ func (g *CommandListDrives) listDrives(cargo interface{}) statemachiner.StateFn 
 	args.Password = session.Password
 	args.Location = session.Location
 	_ = sendRequest(g.channels, args)
+	return nil
+}
+
+func (m *CommandListDrivesDetailed) Start(channels *replizer.Channels) {
+	m.channels = channels
+	stateMachine := &statemachiner.StateMachine{}
+	stateMachine.StartState = m.listDrivesDetailed
+	cargo := DriveCargo{}
+	stateMachine.Start(cargo)
+}
+
+func (m *CommandListDrivesDetailed) listDrivesDetailed(cargo interface{}) statemachiner.StateFn {
+	o := cloudsigma.NewDrives()
+	args := o.NewListDetailed()
+	m.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
+	args.Username = session.Username
+	args.Password = session.Password
+	args.Location = session.Location
+	_ = sendRequest(m.channels, args)
+	return nil
+}
+
+func (m *CommandGetDrive) Start(channels *replizer.Channels) {
+	m.channels = channels
+	stateMachine := &statemachiner.StateMachine{}
+	stateMachine.StartState = m.getDriveUuid
+	cargo := DriveCargo{}
+	stateMachine.Start(cargo)
+}
+
+func (m *CommandGetDrive) getDriveUuid(cargo interface{}) statemachiner.StateFn {
+	// The state machine will not progress beyond this point until the repl
+	// pops from the promptChan.
+	m.channels.PromptChan <- "Uuid:"
+	n := <-m.channels.UserChan
+	c, ok := cargo.(DriveCargo)
+	if ok {
+		c.Uuid = n
+	} else {
+		m.channels.ResponseChan <- "Error asserting Drive in getDriveUuid."
+		return m.getDriveUuid(c)
+	}
+	return m.getDriveSendRequest(c)
+}
+
+func (m *CommandGetDrive) getDriveSendRequest(cargo interface{}) statemachiner.StateFn {
+	o := cloudsigma.NewDrives()
+	c, ok := cargo.(DriveCargo)
+	if !ok {
+		m.channels.ResponseChan <- "Error asserting Drive in getDriveSendRequest."
+		return nil
+	}
+	args := o.NewGet(c.Uuid)
+	m.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
+	args.Username = session.Username
+	args.Password = session.Password
+	args.Location = session.Location
+	_ = sendRequest(m.channels, args)
 	return nil
 }
 

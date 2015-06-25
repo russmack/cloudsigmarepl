@@ -117,10 +117,16 @@ func addCommands(repl *replizer.Repl) {
 		"Create a new server.")
 	addNewCommand(repl, "delete server", NewDeleteServer().Start,
 		"Delete a server.")
+	addNewCommand(repl, "attach drive", NewAttachDrive().Start,
+		"Attach a drive to a server.")
 
 	// Drives
 	addNewCommand(repl, "list drives", NewListDrives().Start,
 		"List all drives.")
+	addNewCommand(repl, "list drives detailed", NewListDrivesDetailed().Start,
+		"List all drives detailed.")
+	addNewCommand(repl, "get drive", NewGetDrive().Start,
+		"Get a drive.")
 	addNewCommand(repl, "create drive", NewCreateDrive().Start,
 		"Create a new drive.")
 	addNewCommand(repl, "delete drive", NewDeleteDrive().Start,

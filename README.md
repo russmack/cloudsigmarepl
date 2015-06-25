@@ -62,10 +62,10 @@ Bye!
 - [X] Notification preferences [list, edit]
 - [X] Notification contacts [list, create, edit, delete]
 - [X] Servers [list, create, delete, start, stop, shutdown]
-- [X] Drives [list, create, delete]
+- [X] Drives [list, list detailed, get single, create, delete]
 - [X] Snapshots [list]
-- [X] Vlans [list, detailed list]
-- [X] IP addresses
+- [X] Vlans [list, detailed list, get single]
+- [X] IP addresses [list, detailed list, get single]
 - [X] Access Control Lists [list]
 
 ## License
