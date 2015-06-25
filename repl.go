@@ -135,6 +135,8 @@ func addCommands(repl *replizer.Repl) {
 		"List vlans.")
 	addNewCommand(repl, "list vlans detailed", NewListVlansDetailed().Start,
 		"List vlans detailed.")
+	addNewCommand(repl, "get vlan", NewGetVlan().Start,
+		"Get a single vlan.")
 	addNewCommand(repl, "list ips", NewListIps().Start,
 		"List IP addresses.")
 
