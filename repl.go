@@ -117,8 +117,8 @@ func addCommands(repl *replizer.Repl) {
 		"Create a new server.")
 	addNewCommand(repl, "delete server", NewDeleteServer().Start,
 		"Delete a server.")
-	addNewCommand(repl, "attach drive", NewAttachDrive().Start,
-		"Attach a drive to a server.")
+	//addNewCommand(repl, "attach drive", NewAttachDrive().Start,
+	//	"Attach a drive to a server.")
 
 	// Drives
 	addNewCommand(repl, "list drives", NewListDrives().Start,
@@ -135,6 +135,10 @@ func addCommands(repl *replizer.Repl) {
 	// Snapshots
 	addNewCommand(repl, "list snapshots", NewListSnapshots().Start,
 		"List all snapshots.")
+	addNewCommand(repl, "list snapshots detailed", NewListSnapshotsDetailed().Start,
+		"List all snapshots detailed.")
+	addNewCommand(repl, "get snapshot", NewGetSnapshot().Start,
+		"Get a snapshot.")
 
 	// Network
 	addNewCommand(repl, "list vlans", NewListVlans().Start,

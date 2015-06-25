@@ -11,6 +11,12 @@ import (
 type CommandListSnapshots struct {
 	channels *replizer.Channels
 }
+type CommandListSnapshotsDetailed struct {
+	channels *replizer.Channels
+}
+type CommandGetSnapshot struct {
+	channels *replizer.Channels
+}
 
 // type CommandStartServer struct {
 // 	channels *replizer.Channels
@@ -29,6 +35,12 @@ type SnapshotCargo struct {
 
 func NewListSnapshots() *CommandListSnapshots {
 	return &CommandListSnapshots{}
+}
+func NewListSnapshotsDetailed() *CommandListSnapshotsDetailed {
+	return &CommandListSnapshotsDetailed{}
+}
+func NewGetSnapshot() *CommandGetSnapshot {
+	return &CommandGetSnapshot{}
 }
 
 // func NewStartServer() *CommandStartServer {
@@ -58,6 +70,64 @@ func (g *CommandListSnapshots) listSnapshots(cargo interface{}) statemachiner.St
 	args.Password = session.Password
 	args.Location = session.Location
 	_ = sendRequest(g.channels, args)
+	return nil
+}
+
+func (m *CommandListSnapshotsDetailed) Start(channels *replizer.Channels) {
+	m.channels = channels
+	stateMachine := &statemachiner.StateMachine{}
+	stateMachine.StartState = m.listSnapshotsDetailed
+	cargo := SnapshotCargo{}
+	stateMachine.Start(cargo)
+}
+
+func (m *CommandListSnapshotsDetailed) listSnapshotsDetailed(cargo interface{}) statemachiner.StateFn {
+	o := cloudsigma.NewSnapshots()
+	args := o.NewListDetailed()
+	m.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
+	args.Username = session.Username
+	args.Password = session.Password
+	args.Location = session.Location
+	_ = sendRequest(m.channels, args)
+	return nil
+}
+
+func (m *CommandGetSnapshot) Start(channels *replizer.Channels) {
+	m.channels = channels
+	stateMachine := &statemachiner.StateMachine{}
+	stateMachine.StartState = m.getSnapshotUuid
+	cargo := SnapshotCargo{}
+	stateMachine.Start(cargo)
+}
+
+func (m *CommandGetSnapshot) getSnapshotUuid(cargo interface{}) statemachiner.StateFn {
+	// The state machine will not progress beyond this point until the repl
+	// pops from the promptChan.
+	m.channels.PromptChan <- "Uuid:"
+	n := <-m.channels.UserChan
+	c, ok := cargo.(SnapshotCargo)
+	if ok {
+		c.Uuid = n
+	} else {
+		m.channels.ResponseChan <- "Error asserting Snapshot in getSnapshotUuid."
+		return m.getSnapshotUuid(c)
+	}
+	return m.getSnapshotSendRequest(c)
+}
+
+func (m *CommandGetSnapshot) getSnapshotSendRequest(cargo interface{}) statemachiner.StateFn {
+	o := cloudsigma.NewSnapshots()
+	c, ok := cargo.(SnapshotCargo)
+	if !ok {
+		m.channels.ResponseChan <- "Error asserting Snapshot in getSnapshotSendRequest."
+		return nil
+	}
+	args := o.NewGet(c.Uuid)
+	m.channels.MessageChan <- fmt.Sprintf("Using username: %s", session.Username)
+	args.Username = session.Username
+	args.Password = session.Password
+	args.Location = session.Location
+	_ = sendRequest(m.channels, args)
 	return nil
 }
 
