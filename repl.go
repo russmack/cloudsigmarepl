@@ -139,6 +139,8 @@ func addCommands(repl *replizer.Repl) {
 		"List all snapshots detailed.")
 	addNewCommand(repl, "get snapshot", NewGetSnapshot().Start,
 		"Get a snapshot.")
+	addNewCommand(repl, "delete snapshot", NewDeleteSnapshot().Start,
+		"Delete a snapshot.")
 
 	// Network
 	addNewCommand(repl, "list vlans", NewListVlans().Start,
