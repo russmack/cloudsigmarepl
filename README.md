@@ -66,7 +66,8 @@ Bye!
 - [X] Snapshots [list, list detailed, get single, delete]
 - [X] Vlans [list, detailed list, get single]
 - [X] IP addresses [list, detailed list, get single]
-- [X] Access Control Lists [list]
+- [X] Access Control Lists [list, get single]
+- [X] Tags [list, get single]
 
 ## License
 BSD 3-Clause: [LICENSE.txt](LICENSE.txt)

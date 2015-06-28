@@ -175,5 +175,13 @@ func addCommands(repl *replizer.Repl) {
 	// Access Control Lists
 	addNewCommand(repl, "list acls", NewListAcls().Start,
 		"List access control lists.")
+	addNewCommand(repl, "get acl", NewGetAcl().Start,
+		"Get an ACL.")
+
+	// Tags
+	addNewCommand(repl, "list tags", NewListTags().Start,
+		"List tags.")
+	addNewCommand(repl, "get tag", NewGetTag().Start,
+		"Get a tag.")
 
 }
