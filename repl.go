@@ -184,4 +184,7 @@ func addCommands(repl *replizer.Repl) {
 	addNewCommand(repl, "get tag", NewGetTag().Start,
 		"Get a tag.")
 
+	// Logs
+	addNewCommand(repl, "list logs", NewListLogs().Start,
+		"List audit logs.")
 }
