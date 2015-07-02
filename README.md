@@ -69,6 +69,7 @@ Bye!
 - [X] Access Control Lists [list, get single]
 - [X] Tags [list, get single]
 - [X] Logs [list]
+- [X] Jobs [list]
 - [X] Firewall Policies [list]
 
 ## License

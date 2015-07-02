@@ -188,6 +188,10 @@ func addCommands(repl *replizer.Repl) {
 	addNewCommand(repl, "list logs", NewListLogs().Start,
 		"List audit logs.")
 
+	// Jobs
+	addNewCommand(repl, "list jobs", NewListJobs().Start,
+		"List jobs.")
+
 	// Firewall Policies
 	addNewCommand(repl, "list fwpolicies", NewListFwPolicies().Start,
 		"List firewall policies.")
