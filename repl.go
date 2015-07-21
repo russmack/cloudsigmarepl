@@ -139,6 +139,8 @@ func addCommands(repl *replizer.Repl) {
 		"List all snapshots detailed.")
 	addNewCommand(repl, "get snapshot", NewGetSnapshot().Start,
 		"Get a snapshot.")
+	addNewCommand(repl, "create snapshot", NewCreateSnapshot().Start,
+		"Create a snapshot.")
 	addNewCommand(repl, "delete snapshot", NewDeleteSnapshot().Start,
 		"Delete a snapshot.")
 
@@ -195,5 +197,9 @@ func addCommands(repl *replizer.Repl) {
 	// Firewall Policies
 	addNewCommand(repl, "list fwpolicies", NewListFwPolicies().Start,
 		"List firewall policies.")
+
+	// Keypairs
+	addNewCommand(repl, "list keypairs", NewListKeypairs().Start,
+		"List SSH keypairs.")
 
 }
