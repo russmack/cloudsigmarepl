@@ -63,10 +63,11 @@ Bye!
 - [X] Notification contacts [list, create, edit, delete]
 - [X] Servers [list, create, delete, start, stop, shutdown]
 - [X] Drives [list, list detailed, get single, create, delete]
-- [X] Snapshots [list, list detailed, get single, delete]
+- [X] Snapshots [list, list detailed, get single, create, delete]
 - [X] Vlans [list, detailed list, get single]
 - [X] IP addresses [list, detailed list, get single]
 - [X] Access Control Lists [list, get single]
+- [X] Keypairs
 - [X] Tags [list, get single]
 - [X] Logs [list]
 - [X] Jobs [list]
